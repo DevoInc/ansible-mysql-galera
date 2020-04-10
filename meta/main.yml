@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Fran Rodríguez
-  role_name: devoinc.mysql-galera
+  role_name: mysql-galera
   description: Ansible for Galera installation in Ubuntu/RedHat
   company: Devo Inc.
   # If the issue tracker for your role is not on github, uncomment the
