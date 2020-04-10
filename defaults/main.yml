@@ -3,3 +3,4 @@
 mysql_galera_root_user_password: 'changeme'
 mysql_galera_node_address: 0.0.0.0
 mysql_galera_wsrep_version: 5.6
+mysql_galera_wrep_cluster_name: test
