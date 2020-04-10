@@ -1,0 +1,4 @@
+---
+mysql_galera_wsrep_provider: /usr/lib64/galera-3/libgalera_smm.so
+mysql_galera_conf_dir: /etc/my.conf.d
+

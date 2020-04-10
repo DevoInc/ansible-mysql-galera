@@ -1,0 +1,42 @@
+---
+- name: Remove MariaDB packages
+  yum:
+    name: "mariadb-libs*"
+    state: absent
+
+- name: Import Galera RPM key
+  rpm_key:
+    key: http://releases.galeracluster.com/GPG-KEY-galeracluster.com
+    state: present
+
+- name: Configure Galera RPM repositorie
+  yum_repository:
+    name: galera
+    description: 'Galera repository'
+    baseurl: http://releases.galeracluster.com/galera-3/centos/7/x86_64/
+    state: present
+
+- name: Configure MySQL-Wsrep RPM repositorie
+  yum_repository:
+    name: "mysql-wsrep"
+    description: 'Mysql-Wsrep repository'
+    baseurl: "http://releases.galeracluster.com/mysql-wsrep-{{ mysql_galera_wsrep_version }}/centos/7/x86_64/"
+    state: present
+
+- name: Install Mysql-Wsrep package
+  yum:
+    name: "mysql-wsrep-{{ mysql_galera_wsrep_version }}"
+    state: present
+    enablerepo: "mysql-wsrep"
+
+- name: Install Galera packages
+  yum:
+    name: "{{ item }}"
+    state: present
+    enablerepo: "galera"
+  with_items:
+    - galera-3
+    - policycoreutils-python
+    - lsof
+    - rsync
+

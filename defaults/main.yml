@@ -1,0 +1,5 @@
+---
+# defaults file for logtrust.galera
+mysql_galera_root_user_password: 'changeme'
+mysql_galera_node_address: 0.0.0.0
+mysql_galera_wsrep_version: 5.6

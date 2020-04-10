@@ -1,0 +1,71 @@
+---
+- name: Create apparmor file
+  file:
+    path: /etc/apparmor.d/local/usr.sbin.mysqld
+    state: touch
+
+- name: Disable apparmor for MySQL
+  command: aa-complain /usr/sbin/mysqld
+
+- ufw:
+    state: disabled
+    policy: allow
+
+- name: Add apt key for Galera server
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: 44B7345738EBDE52594DAD80D669017EBC19DDBA
+    state: present
+
+- name: Add apt key for Percona Server
+  apt_key:
+    keyserver: keys.gnupg.net
+    id: 9334A25F8507EFA5
+    state: present
+
+- name: Add repo for Galera
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+    filename: galera-repo
+    update_cache: yes
+  with_items:
+    - "deb http://releases.galeracluster.com/mysql-wsrep-{{ galera_mysql_wsrep_version }}/ubuntu/ xenial main"
+    - deb http://releases.galeracluster.com/galera-3/ubuntu xenial main
+
+- name: Add repo Percona
+  apt_repository:
+    repo: deb http://repo.percona.com/apt xenial main
+    state: present
+    filename: percona-repo
+    update_cache: yes
+
+- name: Add Galera repo preference
+  template:
+    src: galera.pref.j2
+    dest: /etc/apt/preferences.d/galera.pref
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Specify MySQL root password before installing
+  debconf:
+    name: "mysql-wsrep-server-{{ galera_mysql_wsrep_version }}"
+    question: mysql-server/root_password
+    value: '{{ mysql_root_user_password | quote }}'
+    vtype: password
+  become: true
+
+- name: Confirm MySQL root password before installing
+  debconf:
+    name: "mysql-wsrep-server-{{ galera_mysql_wsrep_version }}"
+    question: mysql-server/root_password_again
+    value: '{{ mysql_root_user_password | quote }}'
+    vtype: password
+  become: true
+
+- name: Install packages Galera
+  apt:
+    name: ['software-properties-common', 'galera-3', 'galera-arbitrator-3', 'mysql-wsrep-{{ galera_mysql_wsrep_version }}', 'rsync', 'debconf-utils', 'apparmor-utils']
+    state: present
+
